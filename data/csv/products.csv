@@ -1,0 +1,102 @@
+product_id,product_name,category,is_subscription,billing_cycle,base_price_usd,first_release_date,vendor,resale_model,brand_safe_name,product_name_orig,base_price_usd_orig,base_key,product_version
+PROD0001,Microsoft 365 Business Standard Monthly,Productivity Suite,True,Monthly,49.0,2023-11-24 00:00:00,Microsoft,Direct resale,Office Suite 365 Business Standard Monthly,Microsoft 365 Business Standard Monthly,49.0,microsoft 365 business standard,v3.0
+PROD0002,Microsoft 365 Business Standard Annual,Productivity Suite,True,Annual,499.0,2023-02-27 00:00:00,Microsoft,Direct resale,Office Suite 365 Business Standard Annual,Microsoft 365 Business Standard Annual,499.0,microsoft 365 business standard,v3.0
+PROD0003,Adobe Creative Cloud All Apps Monthly,Productivity Suite,True,Monthly,29.0,2023-01-13 00:00:00,Adobe,Direct resale,Creative Suite Creative Cloud All Apps Monthly,Adobe Creative Cloud All Apps Monthly,29.0,adobe creative cloud all apps,v3.0
+PROD0004,Adobe Creative Cloud All Apps Annual,Productivity Suite,True,Annual,299.0,2023-05-21 00:00:00,Adobe,Direct resale,Creative Suite Creative Cloud All Apps Annual,Adobe Creative Cloud All Apps Annual,299.0,adobe creative cloud all apps,v3.0
+PROD0005,AI Analytics Add‑on Monthly,Add-on,True,Monthly,15.0,2023-05-06 00:00:00,AI Tools,Marketplace,AI Analytics Add‑on Monthly,AI Analytics Add‑on Monthly,15.0,ai analytics add‑on,v3.0
+PROD0006,AI Analytics Add‑on Annual,Add-on,True,Annual,149.0,2023-04-25 00:00:00,AI Tools,Marketplace,AI Analytics Add‑on Annual,AI Analytics Add‑on Annual,149.0,ai analytics add‑on,v3.0
+PROD0007,Team Seats Add‑on Monthly,Add-on,True,Monthly,9.0,2023-03-13 00:00:00,Other,Affiliate,Team Seats Add‑on Monthly,Team Seats Add‑on Monthly,9.0,team seats add‑on,v3.0
+PROD0008,Team Seats Add‑on Annual,Add-on,True,Annual,89.0,2023-02-22 00:00:00,Other,Affiliate,Team Seats Add‑on Annual,Team Seats Add‑on Annual,89.0,team seats add‑on,v3.0
+PROD0009,Perpetual License (Legacy) One-time,Perpetual,False,One-time,199.0,2023-12-13 00:00:00,Other,Affiliate,Perpetual License (Legacy) One-time,Perpetual License (Legacy) One-time,199.0,perpetual license (legacy) one-time,v3.0
+PROD0010,Priority Support Monthly,Support,True,Monthly,25.0,2023-10-07 00:00:00,Other,Affiliate,Priority Support Monthly,Priority Support Monthly,25.0,priority support,v3.0
+PROD0011,Priority Support Annual,Support,True,Annual,249.0,2023-02-14 00:00:00,Other,Affiliate,Priority Support Annual,Priority Support Annual,249.0,priority support,v3.0
+PROD0012,Onboarding Training Pack One-time,Services,False,One-time,399.0,2023-10-30 00:00:00,AI Tools,Marketplace,Onboarding Training Pack One-time,Onboarding Training Pack One-time,399.0,onboarding training pack one-time,v3.0
+PROD0013,Zoom Pro Monthly,Collaboration,True,Monthly,14.99,2024-02-01 00:00:00,Zoom,Direct resale,Video Meeting Pro Pro Monthly,Zoom Pro Monthly,14.99,zoom pro,v4.0
+PROD0014,Zoom Pro Annual,Collaboration,True,Annual,149.9,2024-02-01 00:00:00,Zoom,Direct resale,Video Meeting Pro Pro Annual,Zoom Pro Annual,149.9,zoom pro,v4.0
+PROD0015,Slack Pro Monthly,Collaboration,True,Monthly,8.75,2024-02-01 00:00:00,Slack,Direct resale,Team Chat Pro Pro Monthly,Slack Pro Monthly,8.75,slack pro,v4.0
+PROD0016,Slack Pro Annual,Collaboration,True,Annual,105.0,2024-02-01 00:00:00,Slack,Direct resale,Team Chat Pro Pro Annual,Slack Pro Annual,105.0,slack pro,v4.0
+PROD0017,GitHub Copilot Business Monthly,Developer Tools,True,Monthly,19.0,2024-02-01 00:00:00,GitHub,Affiliate,DevTools AI Helper Business Monthly,GitHub Copilot Business Monthly,19.0,github copilot business,v4.0
+PROD0018,GitHub Copilot Business Annual,Developer Tools,True,Annual,228.0,2024-02-01 00:00:00,GitHub,Affiliate,DevTools AI Helper Business Annual,GitHub Copilot Business Annual,228.0,github copilot business,v4.0
+PROD0019,Figma Professional Monthly,Design,True,Monthly,15.0,2024-02-01 00:00:00,Figma,Marketplace,Design Cloud Professional Monthly,Figma Professional Monthly,15.0,figma professional,v4.0
+PROD0020,Figma Professional Annual,Design,True,Annual,144.0,2024-02-01 00:00:00,Figma,Marketplace,Design Cloud Professional Annual,Figma Professional Annual,144.0,figma professional,v4.0
+PROD0021,Notion Plus Monthly,Productivity,True,Monthly,10.0,2024-02-01 00:00:00,Notion,Marketplace,Workspace Suite Plus Monthly,Notion Plus Monthly,10.0,notion plus,v4.0
+PROD0022,Notion Plus Annual,Productivity,True,Annual,96.0,2024-02-01 00:00:00,Notion,Marketplace,Workspace Suite Plus Annual,Notion Plus Annual,96.0,notion plus,v4.0
+PROD0023,Jira Software Standard Monthly,Project Management,True,Monthly,8.0,2024-02-01 00:00:00,Atlassian,Direct resale,Project Tracker Software Standard Monthly,Jira Software Standard Monthly,8.0,jira software standard,v4.0
+PROD0024,Jira Software Standard Annual,Project Management,True,Annual,84.0,2024-02-01 00:00:00,Atlassian,Direct resale,Project Tracker Software Standard Annual,Jira Software Standard Annual,84.0,jira software standard,v4.0
+PROD0025,JetBrains All Products Pack Monthly,Developer Tools,True,Monthly,29.0,2024-02-01 00:00:00,JetBrains,Direct resale,Code Studio All Products Pack Monthly,JetBrains All Products Pack Monthly,29.0,jetbrains all products pack,v4.0
+PROD0026,JetBrains All Products Pack Annual,Developer Tools,True,Annual,289.0,2024-02-01 00:00:00,JetBrains,Direct resale,Code Studio All Products Pack Annual,JetBrains All Products Pack Annual,289.0,jetbrains all products pack,v4.0
+PROD0027,Zoom Whiteboard Add‑on Monthly,Add-on,True,Monthly,7.0,2024-02-01 00:00:00,Zoom,Direct resale,Video Meeting Pro Whiteboard Add‑on Monthly,Zoom Whiteboard Add‑on Monthly,7.0,zoom whiteboard add‑on,v4.0
+PROD0028,Zoom Whiteboard Add‑on Annual,Add-on,True,Annual,70.0,2024-02-01 00:00:00,Zoom,Direct resale,Video Meeting Pro Whiteboard Add‑on Annual,Zoom Whiteboard Add‑on Annual,70.0,zoom whiteboard add‑on,v4.0
+PROD0029,Slack Huddles Add‑on Monthly,Add-on,True,Monthly,5.0,2024-02-01 00:00:00,Slack,Direct resale,Team Chat Pro Huddles Add‑on Monthly,Slack Huddles Add‑on Monthly,5.0,slack huddles add‑on,v4.0
+PROD0030,Slack Huddles Add‑on Annual,Add-on,True,Annual,50.0,2024-02-01 00:00:00,Slack,Direct resale,Team Chat Pro Huddles Add‑on Annual,Slack Huddles Add‑on Annual,50.0,slack huddles add‑on,v4.0
+PROD0031,Advanced Reports Add‑on Monthly,Add-on,True,Monthly,12.0,2024-02-01 00:00:00,Other,Affiliate,Advanced Reports Add‑on Monthly,Advanced Reports Add‑on Monthly,12.0,advanced reports add‑on,v4.0
+PROD0032,Advanced Reports Add‑on Annual,Add-on,True,Annual,120.0,2024-02-01 00:00:00,Other,Affiliate,Advanced Reports Add‑on Annual,Advanced Reports Add‑on Annual,120.0,advanced reports add‑on,v4.0
+PROD0033,AI Assistant Add‑on Monthly,Add-on,True,Monthly,9.0,2024-02-01 00:00:00,AI Tools,Marketplace,AI Assistant Add‑on Monthly,AI Assistant Add‑on Monthly,9.0,ai assistant add‑on,v4.0
+PROD0034,AI Assistant Add‑on Annual,Add-on,True,Annual,90.0,2024-02-01 00:00:00,AI Tools,Marketplace,AI Assistant Add‑on Annual,AI Assistant Add‑on Annual,90.0,ai assistant add‑on,v4.0
+PROD0035,Miro Business Monthly,Collaboration,True,Monthly,16.0,2024-02-01 00:00:00,Other,Affiliate,Miro Business Monthly,Miro Business Monthly,16.0,miro business,v4.0
+PROD0036,Miro Business Annual,Collaboration,True,Annual,160.0,2024-02-01 00:00:00,Other,Affiliate,Miro Business Annual,Miro Business Annual,160.0,miro business,v4.0
+PROD0037,Asana Premium Monthly,Project Management,True,Monthly,12.5,2024-02-01 00:00:00,Atlassian,Direct resale,Asana Premium Monthly,Asana Premium Monthly,12.5,asana premium,v4.0
+PROD0038,Asana Premium Annual,Project Management,True,Annual,125.0,2024-02-01 00:00:00,Atlassian,Direct resale,Asana Premium Annual,Asana Premium Annual,125.0,asana premium,v4.0
+PROD0039,Tableau Creator Monthly,Analytics,True,Monthly,25.0,2024-02-01 00:00:00,Tableau,Marketplace,Viz Pro Creator Monthly,Tableau Creator Monthly,25.0,tableau creator,v4.0
+PROD0040,Tableau Creator Annual,Analytics,True,Annual,250.0,2024-02-01 00:00:00,Tableau,Marketplace,Viz Pro Creator Annual,Tableau Creator Annual,250.0,tableau creator,v4.0
+PROD0041,Canva Pro Monthly,Design,True,Monthly,12.0,2024-02-01 00:00:00,Canva,Marketplace,Design Pro Pro Monthly,Canva Pro Monthly,12.0,canva pro,v4.0
+PROD0042,Canva Pro Annual,Design,True,Annual,120.0,2024-02-01 00:00:00,Canva,Marketplace,Design Pro Pro Annual,Canva Pro Annual,120.0,canva pro,v4.0
+PROD0043,Dropbox Standard Monthly,File Storage,True,Monthly,10.0,2024-02-01 00:00:00,Dropbox,Direct resale,File Cloud Standard Monthly,Dropbox Standard Monthly,10.0,dropbox standard,v4.0
+PROD0044,Dropbox Standard Annual,File Storage,True,Annual,100.0,2024-02-01 00:00:00,Dropbox,Direct resale,File Cloud Standard Annual,Dropbox Standard Annual,100.0,dropbox standard,v4.0
+PROD0045,Monday.com Standard Monthly,Project Management,True,Monthly,15.0,2024-02-01 00:00:00,Atlassian,Direct resale,Monday.com Standard Monthly,Monday.com Standard Monthly,15.0,monday.com standard,v4.0
+PROD0046,Monday.com Standard Annual,Project Management,True,Annual,150.0,2024-02-01 00:00:00,Atlassian,Direct resale,Monday.com Standard Annual,Monday.com Standard Annual,150.0,monday.com standard,v4.0
+PROD0047,Freshdesk Growth Monthly,Support,True,Monthly,9.0,2024-02-01 00:00:00,Zendesk,Direct resale,Support Desk Growth Monthly,Freshdesk Growth Monthly,9.0,freshdesk growth,v4.0
+PROD0048,Freshdesk Growth Annual,Support,True,Annual,90.0,2024-02-01 00:00:00,Zendesk,Direct resale,Support Desk Growth Annual,Freshdesk Growth Annual,90.0,freshdesk growth,v4.0
+PROD0049,Zendesk Suite Team Monthly,Support,True,Monthly,13.0,2024-02-01 00:00:00,Zendesk,Direct resale,Support Hub Suite Team Monthly,Zendesk Suite Team Monthly,13.0,zendesk suite team,v4.0
+PROD0050,Zendesk Suite Team Annual,Support,True,Annual,130.0,2024-02-01 00:00:00,Zendesk,Direct resale,Support Hub Suite Team Annual,Zendesk Suite Team Annual,130.0,zendesk suite team,v4.0
+PROD0051,Airtable Team Monthly,Productivity,True,Monthly,20.0,2024-02-01 00:00:00,AI Tools,Marketplace,Airtable Team Monthly,Airtable Team Monthly,20.0,airtable team,v4.0
+PROD0052,Airtable Team Annual,Productivity,True,Annual,200.0,2024-02-01 00:00:00,AI Tools,Marketplace,Airtable Team Annual,Airtable Team Annual,200.0,airtable team,v4.0
+PROD0053,Datadog Pro Monthly,Monitoring,True,Monthly,29.0,2024-02-01 00:00:00,Datadog,Direct resale,Monitor Pro Pro Monthly,Datadog Pro Monthly,29.0,datadog pro,v4.0
+PROD0054,Datadog Pro Annual,Monitoring,True,Annual,290.0,2024-02-01 00:00:00,Datadog,Direct resale,Monitor Pro Pro Annual,Datadog Pro Annual,290.0,datadog pro,v4.0
+PROD0055,Cloud Storage 1TB Monthly,Infrastructure,True,Monthly,6.0,2024-02-01 00:00:00,Other,Affiliate,Cloud Storage 1TB Monthly,Cloud Storage 1TB Monthly,6.0,cloud storage 1tb,v4.0
+PROD0056,Cloud Storage 1TB Annual,Infrastructure,True,Annual,60.0,2024-02-01 00:00:00,Other,Affiliate,Cloud Storage 1TB Annual,Cloud Storage 1TB Annual,60.0,cloud storage 1tb,v4.0
+PROD0057,Endpoint Security Monthly,Security,True,Monthly,5.0,2024-02-01 00:00:00,Security,Affiliate,Endpoint Security Monthly,Endpoint Security Monthly,5.0,endpoint security,v4.0
+PROD0058,Endpoint Security Annual,Security,True,Annual,50.0,2024-02-01 00:00:00,Security,Affiliate,Endpoint Security Annual,Endpoint Security Annual,50.0,endpoint security,v4.0
+PROD0059,Azure AI Studio Monthly,Developer Tools,True,Monthly,29.0,2024-03-01 00:00:00,Microsoft,Direct resale,Cloud AI Studio AI Studio Monthly,Azure AI Studio Monthly,29.0,azure ai studio,v4.0
+PROD0060,Microsoft Copilot for Office Annual,AI Productivity,True,Annual,225.15,2024-03-01 00:00:00,Microsoft,Direct resale,Office Suite AI Helper for Office Annual,Microsoft Copilot for Office Annual,190.0,microsoft copilot for office,v4.0
+PROD0061,Notion AI Monthly,Productivity,True,Monthly,10.0,2024-03-01 00:00:00,Notion,Marketplace,Workspace Suite AI Monthly,Notion AI Monthly,10.0,notion ai,v4.0
+PROD0062,Microsoft Copilot for Office Annual Standard,AI Productivity,True,Annual,225.15,2024-03-01 00:00:00,Microsoft,Direct resale,Office Suite AI Helper for Office Annual Standard,Microsoft Copilot for Office Annual,190.0,microsoft copilot for office,v4.0
+PROD0063,Notion AI Monthly Standard,Productivity,True,Monthly,9.88,2024-03-01 00:00:00,Notion,Marketplace,Workspace Suite AI Monthly Standard,Notion AI Monthly,10.0,notion ai,v4.0
+PROD0064,Power BI Pro Annual,Analytics,True,Annual,153.78,2024-03-01 00:00:00,Microsoft,Direct resale,Analytics Pro Pro Annual,Power BI Pro Annual,130.0,power bi pro,v4.0
+PROD0065,Microsoft Copilot for Office Monthly,AI Productivity,True,Monthly,19.0,2024-03-01 00:00:00,Microsoft,Direct resale,Office Suite AI Helper for Office Monthly,Microsoft Copilot for Office Monthly,19.0,microsoft copilot for office,v4.0
+PROD0066,Power BI Pro Annual Standard,Analytics,True,Annual,153.78,2024-03-01 00:00:00,Microsoft,Direct resale,Analytics Pro Pro Annual Standard,Power BI Pro Annual,130.0,power bi pro,v4.0
+PROD0067,Microsoft Copilot for Office Monthly Standard,AI Productivity,True,Monthly,18.92,2024-03-01 00:00:00,Microsoft,Direct resale,Office Suite AI Helper for Office Monthly Standard,Microsoft Copilot for Office Monthly,19.0,microsoft copilot for office,v4.0
+PROD0068,Adobe Firefly Creative AI Annual,Design,True,Annual,234.95,2024-03-01 00:00:00,Adobe,Direct resale,Creative Suite Firefly Creative AI Annual,Adobe Firefly Creative AI Annual,200.0,adobe firefly creative ai,v4.0
+PROD0069,Power BI Pro Monthly,Analytics,True,Monthly,13.0,2024-03-01 00:00:00,Microsoft,Direct resale,Analytics Pro Pro Monthly,Power BI Pro Monthly,13.0,power bi pro,v4.0
+PROD0070,Adobe Firefly Creative AI Annual Standard,Design,True,Annual,234.95,2024-03-01 00:00:00,Adobe,Direct resale,Creative Suite Firefly Creative AI Annual Standard,Adobe Firefly Creative AI Annual,200.0,adobe firefly creative ai,v4.0
+PROD0071,Power BI Pro Monthly Standard,Analytics,True,Monthly,13.07,2024-03-01 00:00:00,Microsoft,Direct resale,Analytics Pro Pro Monthly Standard,Power BI Pro Monthly,13.0,power bi pro,v4.0
+PROD0072,ChatGPT Team Annual,AI Tools,True,Annual,267.4,2024-03-01 00:00:00,AI Tools,Marketplace,AI Assistant Team Annual,ChatGPT Team Annual,250.0,chatgpt team,v4.0
+PROD0073,Adobe Firefly Creative AI Monthly,Design,True,Monthly,20.0,2024-03-01 00:00:00,Adobe,Direct resale,Creative Suite Firefly Creative AI Monthly,Adobe Firefly Creative AI Monthly,20.0,adobe firefly creative ai,v4.0
+PROD0074,ChatGPT Team Annual Standard,AI Tools,True,Annual,267.4,2024-03-01 00:00:00,AI Tools,Marketplace,AI Assistant Team Annual Standard,ChatGPT Team Annual,250.0,chatgpt team,v4.0
+PROD0075,Adobe Firefly Creative AI Monthly Standard,Design,True,Monthly,20.12,2024-03-01 00:00:00,Adobe,Direct resale,Creative Suite Firefly Creative AI Monthly Standard,Adobe Firefly Creative AI Monthly,20.0,adobe firefly creative ai,v4.0
+PROD0076,Azure AI Studio Annual,Developer Tools,True,Annual,316.27,2024-03-01 00:00:00,Microsoft,Direct resale,Cloud AI Studio AI Studio Annual,Azure AI Studio Annual,290.0,azure ai studio,v4.0
+PROD0077,ChatGPT Team Monthly,AI Tools,True,Monthly,25.0,2024-03-01 00:00:00,AI Tools,Marketplace,AI Assistant Team Monthly,ChatGPT Team Monthly,25.0,chatgpt team,v4.0
+PROD0078,Azure AI Studio Annual Standard,Developer Tools,True,Annual,316.27,2024-03-01 00:00:00,Microsoft,Direct resale,Cloud AI Studio AI Studio Annual Standard,Azure AI Studio Annual,290.0,azure ai studio,v4.0
+PROD0079,ChatGPT Team Monthly Standard,AI Tools,True,Monthly,24.57,2024-03-01 00:00:00,AI Tools,Marketplace,AI Assistant Team Monthly Standard,ChatGPT Team Monthly,25.0,chatgpt team,v4.0
+PROD0080,Notion AI Annual,Productivity,True,Annual,118.1,2024-03-01 00:00:00,Notion,Marketplace,Workspace Suite AI Annual,Notion AI Annual,100.0,notion ai,v4.0
+PROD0081,Azure AI Studio Monthly Standard,Developer Tools,True,Monthly,29.18,2024-03-01 00:00:00,Microsoft,Direct resale,Cloud AI Studio AI Studio Monthly Standard,Azure AI Studio Monthly,29.0,azure ai studio,v4.0
+PROD0082,Notion AI Annual Standard,Productivity,True,Annual,118.1,2024-03-01 00:00:00,Notion,Marketplace,Workspace Suite AI Annual Standard,Notion AI Annual,100.0,notion ai,v4.0
+PROD0083,Azure AI Studio Monthly Pro,Developer Tools,True,Monthly,36.7,2024-03-01 00:00:00,Microsoft,Direct resale,Cloud AI Studio AI Studio Monthly Pro,Azure AI Studio Monthly,29.0,azure ai studio,v4.0
+PROD0084,Microsoft Copilot for Office Annual Pro,AI Productivity,True,Annual,225.15,2024-03-01 00:00:00,Microsoft,Direct resale,Office Suite AI Helper for Office Annual Pro,Microsoft Copilot for Office Annual,190.0,microsoft copilot for office,v4.0
+PROD0085,Notion AI Monthly Pro,Productivity,True,Monthly,12.4,2024-03-01 00:00:00,Notion,Marketplace,Workspace Suite AI Monthly Pro,Notion AI Monthly,10.0,notion ai,v4.0
+PROD0086,Microsoft Copilot for Office Annual Business,AI Productivity,True,Annual,225.15,2024-03-01 00:00:00,Microsoft,Direct resale,Office Suite AI Helper for Office Annual Business,Microsoft Copilot for Office Annual,190.0,microsoft copilot for office,v4.0
+PROD0087,Notion AI Monthly Business,Productivity,True,Monthly,14.96,2024-03-01 00:00:00,Notion,Marketplace,Workspace Suite AI Monthly Business,Notion AI Monthly,10.0,notion ai,v4.0
+PROD0088,Power BI Pro Annual Pro,Analytics,True,Annual,153.78,2024-03-01 00:00:00,Microsoft,Direct resale,Analytics Pro Pro Annual Pro,Power BI Pro Annual,130.0,power bi pro,v4.0
+PROD0089,Microsoft Copilot for Office Monthly Pro,AI Productivity,True,Monthly,23.45,2024-03-01 00:00:00,Microsoft,Direct resale,Office Suite AI Helper for Office Monthly Pro,Microsoft Copilot for Office Monthly,19.0,microsoft copilot for office,v4.0
+PROD0090,Power BI Pro Annual Business,Analytics,True,Annual,153.78,2024-03-01 00:00:00,Microsoft,Direct resale,Analytics Pro Pro Annual Business,Power BI Pro Annual,130.0,power bi pro,v4.0
+PROD0091,Microsoft Copilot for Office Monthly Business,AI Productivity,True,Monthly,28.69,2024-03-01 00:00:00,Microsoft,Direct resale,Office Suite AI Helper for Office Monthly Business,Microsoft Copilot for Office Monthly,19.0,microsoft copilot for office,v4.0
+PROD0092,Adobe Firefly Creative AI Annual Pro,Design,True,Annual,234.95,2024-03-01 00:00:00,Adobe,Direct resale,Creative Suite Firefly Creative AI Annual Pro,Adobe Firefly Creative AI Annual,200.0,adobe firefly creative ai,v4.0
+PROD0093,Power BI Pro Monthly Pro,Analytics,True,Monthly,15.81,2024-03-01 00:00:00,Microsoft,Direct resale,Analytics Pro Pro Monthly Pro,Power BI Pro Monthly,13.0,power bi pro,v4.0
+PROD0094,Adobe Firefly Creative AI Annual Business,Design,True,Annual,234.95,2024-03-01 00:00:00,Adobe,Direct resale,Creative Suite Firefly Creative AI Annual Business,Adobe Firefly Creative AI Annual,200.0,adobe firefly creative ai,v4.0
+PROD0095,Power BI Pro Monthly Business,Analytics,True,Monthly,19.63,2024-03-01 00:00:00,Microsoft,Direct resale,Analytics Pro Pro Monthly Business,Power BI Pro Monthly,13.0,power bi pro,v4.0
+PROD0096,ChatGPT Team Annual Pro,AI Tools,True,Annual,267.4,2024-03-01 00:00:00,AI Tools,Marketplace,AI Assistant Team Annual Pro,ChatGPT Team Annual,250.0,chatgpt team,v4.0
+PROD0097,Adobe Firefly Creative AI Monthly Pro,Design,True,Monthly,24.48,2024-03-01 00:00:00,Adobe,Direct resale,Creative Suite Firefly Creative AI Monthly Pro,Adobe Firefly Creative AI Monthly,20.0,adobe firefly creative ai,v4.0
+PROD0098,ChatGPT Team Annual Business,AI Tools,True,Annual,267.4,2024-03-01 00:00:00,AI Tools,Marketplace,AI Assistant Team Annual Business,ChatGPT Team Annual,250.0,chatgpt team,v4.0
+PROD0099,Adobe Firefly Creative AI Monthly Business,Design,True,Monthly,29.38,2024-03-01 00:00:00,Adobe,Direct resale,Creative Suite Firefly Creative AI Monthly Business,Adobe Firefly Creative AI Monthly,20.0,adobe firefly creative ai,v4.0
+PROD0100,Azure AI Studio Annual Pro,Developer Tools,True,Annual,316.27,2024-03-01 00:00:00,Microsoft,Direct resale,Cloud AI Studio AI Studio Annual Pro,Azure AI Studio Annual,290.0,azure ai studio,v4.0
+PROD0101,ChatGPT Team Monthly Pro,AI Tools,True,Monthly,30.65,2024-03-01 00:00:00,AI Tools,Marketplace,AI Assistant Team Monthly Pro,ChatGPT Team Monthly,25.0,chatgpt team,v4.0
