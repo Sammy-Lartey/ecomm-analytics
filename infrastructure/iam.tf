@@ -1,4 +1,6 @@
 # ── Glue IAM role ─────────────────────────────────────────────────────────────
+# Used by the Glue crawler to read the raw S3 bucket and register
+# the schema in the Glue Data Catalog
 resource "aws_iam_role" "glue" {
   name = "${local.prefix}-glue-role"
 
@@ -33,17 +35,11 @@ resource "aws_iam_role_policy" "glue_s3" {
         Effect = "Allow"
         Action = [
           "s3:GetObject",
-          "s3:PutObject",
-          "s3:DeleteObject",
           "s3:ListBucket"
         ]
         Resource = [
           aws_s3_bucket.raw.arn,
-          "${aws_s3_bucket.raw.arn}/*",
-          aws_s3_bucket.processed.arn,
-          "${aws_s3_bucket.processed.arn}/*",
-          aws_s3_bucket.glue_scripts.arn,
-          "${aws_s3_bucket.glue_scripts.arn}/*"
+          "${aws_s3_bucket.raw.arn}/*"
         ]
       }
     ]
@@ -51,6 +47,8 @@ resource "aws_iam_role_policy" "glue_s3" {
 }
 
 # ── Redshift IAM role ─────────────────────────────────────────────────────────
+# Used by Redshift to read CSV files from S3 raw bucket via the COPY command
+# Also allows Redshift to read schema metadata from the Glue Data Catalog
 resource "aws_iam_role" "redshift" {
   name = "${local.prefix}-redshift-role"
 
@@ -84,9 +82,7 @@ resource "aws_iam_role_policy" "redshift_s3" {
         ]
         Resource = [
           aws_s3_bucket.raw.arn,
-          "${aws_s3_bucket.raw.arn}/*",
-          aws_s3_bucket.processed.arn,
-          "${aws_s3_bucket.processed.arn}/*"
+          "${aws_s3_bucket.raw.arn}/*"
         ]
       },
       {
