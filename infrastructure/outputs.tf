@@ -14,7 +14,7 @@ output "glue_scripts_bucket_name" {
 }
 
 output "redshift_workgroup_endpoint" {
-  description = "Redshift Serverless endpoint — use this in dbt profiles.yml"
+  description = "Redshift Serverless endpoint"
   value       = aws_redshiftserverless_workgroup.main.endpoint[0].address
 }
 
@@ -34,6 +34,21 @@ output "glue_role_arn" {
 }
 
 output "glue_crawler_name" {
-  description = "Name of the Glue crawler to run after uploading CSV"
+  description = "Name of the Glue crawler"
   value       = aws_glue_crawler.raw.name
+}
+
+output "glue_job_name" {
+  description = "Name of the Glue ETL job"
+  value       = aws_glue_job.transform.name
+}
+
+output "step_functions_arn" {
+  description = "Step Functions state machine ARN — trigger this to run the full pipeline"
+  value       = aws_sfn_state_machine.pipeline.arn
+}
+
+output "step_functions_name" {
+  description = "Step Functions state machine name"
+  value       = aws_sfn_state_machine.pipeline.name
 }
