@@ -1,3 +1,7 @@
+-- This model calculates key sales metrics by month, including total orders, unique customers, loyal customers, total revenue, average order value, loyal customer percentage, refund rates, and discounted orders. 
+-- It provides insights into sales performance over time, the impact of customer loyalty on monthly sales, and trends in refunds and discount usage. 
+-- This information can help identify seasonal patterns, evaluate the effectiveness of marketing campaigns, and inform inventory and promotional strategies throughout the year.
+
 with orders as (
 
     select * from {{ ref('stg_events') }}

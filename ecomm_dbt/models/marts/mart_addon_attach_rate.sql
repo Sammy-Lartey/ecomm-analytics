@@ -1,3 +1,6 @@
+-- This model calculates the attach rate of add-on products, which is the percentage of customers who bought a core product and also bought an add-on product in the same month. 
+-- It also provides insights into the total number of customers who bought add-ons, the total number of core customers, and the revenue generated from add-ons.
+
 with orders as (
 
     select * from {{ ref('stg_events') }}

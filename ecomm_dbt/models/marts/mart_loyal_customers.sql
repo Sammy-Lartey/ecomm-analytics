@@ -1,3 +1,6 @@
+-- This model identifies loyal customers based on their purchase behavior and calculates key metrics such as total revenue, average order value, and customer lifespan. 
+-- It also provides insights into the primary sales channel for loyal customers and their purchase timeline, which can help inform targeted marketing strategies and customer retention efforts.
+
 with loyal_customers as (
 
     select * from {{ ref('int_loyal_customers') }}

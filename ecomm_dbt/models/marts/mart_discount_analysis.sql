@@ -1,3 +1,7 @@
+-- This model analyzes the performance of discount codes, including total orders, unique customers, loyal customers, revenue generated, average order value, discount amounts, and refund rates. 
+-- It provides insights into which discount codes are most effective at driving sales and customer loyalty, as well as the financial impact of discounts on revenue and profitability. 
+-- This information can help inform future discount strategies, promotional efforts, and customer retention initiatives.
+
 with discount_usage as (
 
     select * from {{ ref('int_discount_usage') }}

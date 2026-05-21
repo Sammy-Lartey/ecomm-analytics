@@ -1,3 +1,7 @@
+-- This model calculates key revenue metrics by billing cycle and product category, including total revenue, average revenue per order, average revenue per customer, and refund rates. 
+-- It also segments the data by loyal vs non-loyal customers to provide insights into how customer loyalty impacts revenue and refunds across different billing cycles and product categories. 
+-- This information can help identify which billing cycles and product categories are most profitable, as well as areas where refunds are more common, allowing for targeted strategies to improve customer retention and revenue growth.
+
 with orders as (
 
     select * from {{ ref('stg_events') }}

@@ -1,3 +1,7 @@
+-- This model calculates key performance metrics for each sales channel, including total orders, unique customers, loyal customers, total revenue, average order value, loyal customer percentage, refund rates, and discount usage. 
+-- It provides insights into which channels are performing best in terms of revenue and customer loyalty, as well as areas where refunds and discount usage are more prevalent. 
+-- This information can help inform marketing strategies, promotional efforts, and customer retention initiatives across different sales channels.
+
 with orders as (
 
     select * from {{ ref('stg_events') }}

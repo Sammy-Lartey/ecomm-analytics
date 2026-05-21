@@ -1,3 +1,7 @@
+-- This model calculates the average selling price (ASP) by country, region, and currency.
+-- It provides insights into the average price customers are paying for products in different markets, as well as the total revenue generated and the impact of discounts on ASP. 
+-- This information can help identify pricing strategies and market performance across different regions.
+
 with orders as (
 
     select * from {{ ref('stg_events') }}
