@@ -1,0 +1,48 @@
+version: 2
+
+sources:
+  - name: raw
+    database: ecomm_db
+    schema: raw
+    description: "Raw bronze layer — CSV files loaded directly from S3 via COPY command. No transformations applied."
+
+    tables:
+      - name: events
+        description: "Raw e-commerce events — orders and invoices. 48,000 rows loaded from events.csv."
+        columns:
+          - name: event_id
+            description: "Unique event identifier"
+            tests:
+              - not_null
+          - name: event_type
+            description: "Type of event — order or invoice"
+            tests:
+              - not_null
+              - accepted_values:
+                  values: ['order', 'invoice']
+          - name: customer_id
+            description: "Foreign key to customers table"
+            tests:
+              - not_null
+          - name: product_id
+            description: "Foreign key to products table"
+            tests:
+              - not_null
+
+      - name: products
+        description: "Raw product catalog. 101 rows loaded from products.csv."
+        columns:
+          - name: product_id
+            description: "Unique product identifier"
+            tests:
+              - not_null
+              - unique
+
+      - name: customers
+        description: "Raw customer profiles. 4,000 rows loaded from customers.csv."
+        columns:
+          - name: customer_id
+            description: "Unique customer identifier"
+            tests:
+              - not_null
+              - unique
