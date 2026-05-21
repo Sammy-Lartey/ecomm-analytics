@@ -1,5 +1,5 @@
 -- This model identifies loyal customers based on their purchase behavior, combining order metrics with customer profile information.
--- A loyal customer is defined as someone who has made 2 or more purchases. 
+-- A loyal customer is defined as someone who has made 10 or more purchases. 
 -- The model also includes key customer attributes and purchase patterns to help understand the characteristics of loyal customers
 
 with customer_orders as (
@@ -19,7 +19,7 @@ loyal as (
     select
         co.customer_id,
 
-        -- loyalty flag — 2 or more orders
+        -- loyalty flag — 10 or more orders
         case
             when co.total_orders >= 10 then true
             else false
