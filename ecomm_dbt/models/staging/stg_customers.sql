@@ -1,3 +1,7 @@
+-- This model cleans and standardizes the raw customer data, ensuring that key fields are properly formatted and that missing values are handled appropriately. 
+-- It also derives new fields such as region based on country information to enable more granular analysis in downstream models. 
+-- The cleaned customer data serves as a foundation for all customer-related analyses in the project.
+
 with source as (
 
     select * from {{ source('raw', 'customers') }}

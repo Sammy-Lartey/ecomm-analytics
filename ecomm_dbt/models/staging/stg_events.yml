@@ -1,3 +1,6 @@
+# This file defines the staging models for the e-commerce analytics project, which clean and standardize the raw data from the source tables.
+# Each staging model corresponds to a source table and includes transformations to handle missing values, standardize formats, and derive new fields for easier analysis in downstream models.
+
 version: 2
 
 models:

@@ -1,3 +1,7 @@
+-- This model cleans and standardizes the raw events data, ensuring that key fields are properly formatted and that missing values are handled appropriately. 
+-- It also derives new fields such as region based on country information and creates standardized date parts for easier time series analysis in downstream models. 
+-- The cleaned events data serves as a foundation for all order-related analyses in the project.
+
 with source as (
 
     select * from {{ source('raw', 'events') }}

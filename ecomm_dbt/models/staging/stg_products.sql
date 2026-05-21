@@ -1,3 +1,7 @@
+-- This model cleans and standardizes the raw product data, ensuring that key fields are properly formatted and that missing values are handled appropriately. 
+-- It also derives new fields such as is_addon based on category information to enable more granular analysis in downstream models. 
+-- The cleaned product data serves as a foundation for all product-related analyses in the project.
+
 with source as (
 
     select * from {{ source('raw', 'products') }}

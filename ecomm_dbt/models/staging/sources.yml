@@ -1,3 +1,5 @@
+# This file defines the source tables for the e-commerce analytics project, providing metadata and documentation for the raw data loaded into the warehouse.
+
 version: 2
 
 sources:
