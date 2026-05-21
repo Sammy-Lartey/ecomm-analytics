@@ -19,7 +19,8 @@ sources:
             tests:
               - not_null
               - accepted_values:
-                  values: ['order', 'invoice']
+                  arguments:
+                    values: ['order', 'invoice']
           - name: customer_id
             description: "Foreign key to customers table"
             tests:
