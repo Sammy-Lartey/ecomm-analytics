@@ -1,3 +1,7 @@
+-- This model identifies loyal customers based on their purchase behavior, combining order metrics with customer profile information.
+-- A loyal customer is defined as someone who has made 2 or more purchases. 
+-- The model also includes key customer attributes and purchase patterns to help understand the characteristics of loyal customers
+
 with customer_orders as (
 
     select * from {{ ref('int_customer_orders') }}

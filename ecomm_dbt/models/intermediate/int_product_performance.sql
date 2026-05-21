@@ -1,3 +1,7 @@
+-- This model aggregates product performance metrics by joining order data with product information. 
+-- It provides insights into which products are driving the most revenue, have the highest average selling price, and are most popular among customers. 
+-- The model also breaks down performance by product attributes like category, brand, and billing cycle to identify trends and opportunities for optimization.
+
 with orders as (
 
     select * from {{ ref('stg_events') }}

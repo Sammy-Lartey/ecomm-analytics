@@ -1,3 +1,6 @@
+-- This model aggregates order data at the customer level, providing insights into purchase behavior, revenue, and customer lifespan. 
+-- It also calculates the time between the first and second purchase to understand customer retention patterns.'
+
 with orders as (
 
     select * from {{ ref('stg_events') }}

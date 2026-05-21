@@ -1,3 +1,7 @@
+-- This model analyzes the usage of discount codes in customer orders, 
+-- providing insights into how different discount codes impact order volume, revenue, and customer loyalty. 
+-- It also identifies which discount codes are most effective at driving repeat purchases and generating revenue.
+
 with orders as (
 
     select * from {{ ref('stg_events') }}
