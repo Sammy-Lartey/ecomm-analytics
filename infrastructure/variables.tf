@@ -29,6 +29,6 @@ variable "redshift_admin_password" {
 }
 
 variable "your_ip_cidr" {
-  description = "Your local IP in CIDR notation for Redshift access (e.g. 102.89.x.x/32)"
+  description = "local IP in CIDR notation for Redshift access (e.g. 102.89.x.x/32)"
   type        = string
 }
