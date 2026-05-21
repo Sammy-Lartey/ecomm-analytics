@@ -118,7 +118,7 @@ resource "aws_redshiftserverless_workgroup" "main" {
   namespace_name = aws_redshiftserverless_namespace.main.namespace_name
   workgroup_name = "${local.prefix}-workgroup"
 
-  base_capacity      = 8    # 8 RPUs — minimum, cheapest for dev
+  base_capacity      = 4    # 4 RPUs — minimum, cheapest for dev
   publicly_accessible = true
 
   subnet_ids         = [aws_subnet.redshift_a.id, aws_subnet.redshift_b.id]
