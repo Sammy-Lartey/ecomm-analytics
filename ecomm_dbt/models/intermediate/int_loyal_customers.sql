@@ -21,7 +21,7 @@ loyal as (
 
         -- loyalty flag — 2 or more orders
         case
-            when co.total_orders >= 2 then true
+            when co.total_orders >= 10 then true
             else false
         end                                                     as is_loyal_customer,
 
