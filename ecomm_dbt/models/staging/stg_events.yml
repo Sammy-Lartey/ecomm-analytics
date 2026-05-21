@@ -1,0 +1,38 @@
+version: 2
+
+models:
+  - name: stg_events
+    description: "Cleaned events — 361 null Excel padding rows removed, types cast, region enriched"
+    columns:
+      - name: event_id
+        tests:
+          - not_null
+          - unique
+      - name: event_type
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['order', 'invoice']
+      - name: customer_id
+        tests:
+          - not_null
+      - name: product_id
+        tests:
+          - not_null
+
+  - name: stg_products
+    description: "Cleaned product catalog"
+    columns:
+      - name: product_id
+        tests:
+          - not_null
+          - unique
+
+  - name: stg_customers
+    description: "Cleaned customer profiles — region enriched for US and Canada"
+    columns:
+      - name: customer_id
+        tests:
+          - not_null
+          - unique
