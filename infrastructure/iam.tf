@@ -1,6 +1,5 @@
-# ── Glue IAM role ─────────────────────────────────────────────────────────────
-# Used by the Glue crawler to read the raw S3 bucket and register
-# the schema in the Glue Data Catalog
+# Glue IAM role
+# Used by the Glue crawler to read the raw S3 bucket and register the schema in the Glue Data Catalog
 resource "aws_iam_role" "glue" {
   name = "${local.prefix}-glue-role"
 
@@ -46,7 +45,7 @@ resource "aws_iam_role_policy" "glue_s3" {
   })
 }
 
-# ── Redshift IAM role ─────────────────────────────────────────────────────────
+# Redshift IAM role
 # Used by Redshift to read CSV files from S3 raw bucket via the COPY command
 # Also allows Redshift to read schema metadata from the Glue Data Catalog
 resource "aws_iam_role" "redshift" {

@@ -1,10 +1,10 @@
-# ── Glue data catalog database ────────────────────────────────────────────────
+# Glue data catalog database
 resource "aws_glue_catalog_database" "raw" {
   name        = "${replace(local.prefix, "-", "_")}_raw"
   description = "Glue catalog for raw e-commerce CSV data"
 }
 
-# ── Glue crawler — discovers schema from S3 raw zone ─────────────────────────
+# Glue crawler — discovers schema from S3 raw zone
 resource "aws_glue_crawler" "raw" {
   name          = "${local.prefix}-raw-crawler"
   role          = aws_iam_role.glue.arn

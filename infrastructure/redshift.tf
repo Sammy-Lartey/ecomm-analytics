@@ -1,4 +1,4 @@
-# ── VPC for Redshift Serverless ───────────────────────────────────────────────
+# VPC for Redshift Serverless
 resource "aws_vpc" "main" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
@@ -62,7 +62,7 @@ resource "aws_route_table_association" "b" {
   route_table_id = aws_route_table.main.id
 }
 
-# ── Security group — allow your IP + QuickSight ───────────────────────────────
+# Security group — allows IP + QuickSight 
 resource "aws_security_group" "redshift" {
   name        = "${local.prefix}-redshift-sg"
   description = "Redshift Serverless access"
@@ -99,7 +99,7 @@ resource "aws_security_group" "redshift" {
   }
 }
 
-# ── Redshift Serverless namespace ─────────────────────────────────────────────
+# Redshift Serverless namespace
 resource "aws_redshiftserverless_namespace" "main" {
   namespace_name      = "${local.prefix}-namespace"
   db_name             = "ecomm_db"
@@ -113,7 +113,7 @@ resource "aws_redshiftserverless_namespace" "main" {
   }
 }
 
-# ── Redshift Serverless workgroup ─────────────────────────────────────────────
+# Redshift Serverless workgroup
 resource "aws_redshiftserverless_workgroup" "main" {
   namespace_name = aws_redshiftserverless_namespace.main.namespace_name
   workgroup_name = "${local.prefix}-workgroup"
