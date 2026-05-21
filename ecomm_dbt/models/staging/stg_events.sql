@@ -82,7 +82,7 @@ cleaned as (
         date_part('quarter', cast(event_date as timestamp))::int as order_quarter
 
     from source
-    where event_id is not null  -- drop 361 fully null Excel padding rows
+    where event_id is not null 
 
 )
 
