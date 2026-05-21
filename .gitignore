@@ -16,3 +16,9 @@ Thumbs.db
 
 # Binaries
 *.exe
+
+# dbt
+ecomm_dbt/target/
+ecomm_dbt/dbt_packages/
+ecomm_dbt/logs/
+logs/
