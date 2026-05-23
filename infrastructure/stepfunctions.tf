@@ -1,4 +1,4 @@
-# CloudWatch log group for Step Functions state machine
+# CloudWatch log group for Step Functions
 resource "aws_cloudwatch_log_group" "sfn" {
   name              = "/aws/states/${local.prefix}-pipeline"
   retention_in_days = 7
@@ -9,7 +9,7 @@ resource "aws_cloudwatch_log_group" "sfn" {
   }
 }
 
-# IAM role for Step Functions with permissions to call Glue and Redshift APIs
+# IAM role for Step Functions
 resource "aws_iam_role" "step_functions" {
   name = "${local.prefix}-sfn-role"
 
@@ -36,7 +36,6 @@ resource "aws_iam_role_policy" "step_functions_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        # Glue crawler permissions
         Effect = "Allow"
         Action = [
           "glue:StartCrawler",
@@ -45,8 +44,6 @@ resource "aws_iam_role_policy" "step_functions_policy" {
         Resource = "*"
       },
       {
-        # Redshift Data API — .sync integration
-        # Step Functions waits for statement completion natively
         Effect = "Allow"
         Action = [
           "redshift-data:ExecuteStatement",
@@ -56,23 +53,17 @@ resource "aws_iam_role_policy" "step_functions_policy" {
         Resource = "*"
       },
       {
-        # EventBridge — needed for .sync and callback patterns
-        Effect = "Allow"
-        Action = [
-          "events:PutTargets",
-          "events:PutRule",
-          "events:DescribeRule"
-        ]
-        Resource = "arn:aws:events:${var.aws_region}:*:rule/StepFunctionsGetEventsFor*"
+        # Invoke the crawler callback Lambda with task token — allowing Step Functions to pause and wait for the crawler to finish
+        Effect   = "Allow"
+        Action   = "lambda:InvokeFunction"
+        Resource = aws_lambda_function.crawler_callback.arn
       },
       {
-        # Allow Redshift to use its IAM role for COPY
         Effect   = "Allow"
         Action   = "iam:PassRole"
         Resource = aws_iam_role.redshift.arn
       },
       {
-        # CloudWatch logging
         Effect = "Allow"
         Action = [
           "logs:CreateLogDelivery",
@@ -92,47 +83,47 @@ resource "aws_iam_role_policy" "step_functions_policy" {
   })
 }
 
-# Step Functions state machine definition with Glue and Redshift tasks, using .sync and callback patterns
+# Step Functions state machine definition:
 resource "aws_sfn_state_machine" "pipeline" {
   name     = "${local.prefix}-pipeline"
   role_arn = aws_iam_role.step_functions.arn
 
   definition = jsonencode({
-    Comment = "E-commerce ingestion pipeline: Glue Crawler → Redshift COPY (event-driven, no polling)"
+    Comment = "E-commerce ingestion pipeline: Glue Crawler → Redshift COPY"
     StartAt = "StartCrawler"
 
     States = {
 
-      # Step 1: Start Glue crawler and wait for completion event
-      # Uses EventBridge callback pattern:
-      # Step Functions sends a task token to Glue via EventBridge.
-      # When the crawler finishes, EventBridge fires a rule that calls
-      # SendTaskSuccess back to Step Functions with the token.
-      # No polling loop — Step Functions pauses and resumes on the event.
+      # Step 1: Start Glue crawler — if it's already running, catch the error and proceed to wait for the callback
       StartCrawler = {
         Type     = "Task"
         Resource = "arn:aws:states:::aws-sdk:glue:startCrawler"
         Parameters = {
           Name = aws_glue_crawler.raw.name
         }
-        Next = "WaitForCrawlerEventBridge"
+        Next = "WaitForCrawler"
         Catch = [
           {
             ErrorEquals = ["Glue.CrawlerRunningException"]
-            Next        = "WaitForCrawlerEventBridge"
-            Comment     = "Crawler already running — wait for completion event"
+            Next        = "WaitForCrawler"
+            Comment     = "Crawler already running — wait for callback"
           }
         ]
       }
 
-      # Wait for EventBridge to fire the crawler completion event
-      # HeartbeatSeconds — fail if no event received within 10 minutes
-      WaitForCrawlerEventBridge = {
+      # Step 2: Pause and wait for EventBridge callback — invoked when Glue crawler finishes
+      # Invokes the crawler_callback Lambda with a task token.
+      # Step Functions pauses here. When the Glue crawler finishes,
+      # EventBridge fires, invoking crawler_callback Lambda which calls
+      # SendTaskSuccess with the token — resuming the execution.
+      WaitForCrawler = {
         Type     = "Task"
-        Resource = "arn:aws:states:::events:waitForTaskToken"
+        Resource = "arn:aws:states:::lambda:invoke.waitForTaskToken"
         Parameters = {
-          RuleArn        = "arn:aws:events:${var.aws_region}:${data.aws_caller_identity.current.account_id}:rule/${local.prefix}-crawler-done"
-          "TaskToken.$"  = "$$.Task.Token"
+          FunctionName   = aws_lambda_function.crawler_callback.arn
+          "Payload" = {
+            "taskToken.$" = "$$.Task.Token"
+          }
         }
         HeartbeatSeconds = 600
         Next             = "LoadEventsToRedshift"
@@ -149,10 +140,7 @@ resource "aws_sfn_state_machine" "pipeline" {
         ]
       }
 
-      # Step 2: Load events.csv to Redshift using Data API and .sync integration
-      # Uses .sync integration — Step Functions calls the Redshift Data API
-      # and waits for the SQL statement to complete before moving on.
-      # No wait states needed — AWS handles this natively.
+      # ── Step 3: Load events.csv ───────────────────────────────────────────
       LoadEventsToRedshift = {
         Type     = "Task"
         Resource = "arn:aws:states:::aws-sdk:redshiftdata:executeStatement"
@@ -161,51 +149,37 @@ resource "aws_sfn_state_machine" "pipeline" {
           Database      = "ecomm_db"
           Sql           = "TRUNCATE TABLE raw.events; COPY raw.events FROM 's3://${aws_s3_bucket.raw.bucket}/events.csv' IAM_ROLE '${aws_iam_role.redshift.arn}' FORMAT AS CSV IGNOREHEADER 1 EMPTYASNULL BLANKSASNULL REGION '${var.aws_region}';"
         }
-        Next = "WaitForEventsStatement"
+        Next = "WaitForEventsLoad"
         Catch = [{ ErrorEquals = ["States.ALL"], Next = "PipelineFailed" }]
       }
 
-      # Poll Redshift Data API for statement completion
-      # Redshift Data API is async — we check status until done
-      WaitForEventsStatement = {
+      WaitForEventsLoad = {
         Type    = "Wait"
         Seconds = 15
-        Next    = "CheckEventsStatement"
+        Next    = "CheckEventsLoad"
       }
 
-      CheckEventsStatement = {
+      CheckEventsLoad = {
         Type     = "Task"
         Resource = "arn:aws:states:::aws-sdk:redshiftdata:describeStatement"
         Parameters = {
           "Id.$" = "$.Id"
         }
-        Next = "IsEventsStatementDone"
+        Next  = "IsEventsLoadDone"
         Catch = [{ ErrorEquals = ["States.ALL"], Next = "PipelineFailed" }]
       }
 
-      IsEventsStatementDone = {
+      IsEventsLoadDone = {
         Type = "Choice"
         Choices = [
-          {
-            Variable     = "$.Status"
-            StringEquals = "FINISHED"
-            Next         = "LoadProductsToRedshift"
-          },
-          {
-            Variable     = "$.Status"
-            StringEquals = "FAILED"
-            Next         = "PipelineFailed"
-          },
-          {
-            Variable     = "$.Status"
-            StringEquals = "ABORTED"
-            Next         = "PipelineFailed"
-          }
+          { Variable = "$.Status", StringEquals = "FINISHED", Next = "LoadProductsToRedshift" },
+          { Variable = "$.Status", StringEquals = "FAILED",   Next = "PipelineFailed" },
+          { Variable = "$.Status", StringEquals = "ABORTED",  Next = "PipelineFailed" }
         ]
-        Default = "WaitForEventsStatement"
+        Default = "WaitForEventsLoad"
       }
 
-      # Step 3: Load products.csv to Redshift using Data API and .sync integration
+      # Step 4: Load products.csv ─ similar pattern to events.csv, with polling to check when the load is finished
       LoadProductsToRedshift = {
         Type     = "Task"
         Resource = "arn:aws:states:::aws-sdk:redshiftdata:executeStatement"
@@ -214,49 +188,37 @@ resource "aws_sfn_state_machine" "pipeline" {
           Database      = "ecomm_db"
           Sql           = "TRUNCATE TABLE raw.products; COPY raw.products FROM 's3://${aws_s3_bucket.raw.bucket}/products.csv' IAM_ROLE '${aws_iam_role.redshift.arn}' FORMAT AS CSV IGNOREHEADER 1 EMPTYASNULL BLANKSASNULL REGION '${var.aws_region}';"
         }
-        Next = "WaitForProductsStatement"
+        Next = "WaitForProductsLoad"
         Catch = [{ ErrorEquals = ["States.ALL"], Next = "PipelineFailed" }]
       }
 
-      WaitForProductsStatement = {
+      WaitForProductsLoad = {
         Type    = "Wait"
         Seconds = 15
-        Next    = "CheckProductsStatement"
+        Next    = "CheckProductsLoad"
       }
 
-      CheckProductsStatement = {
+      CheckProductsLoad = {
         Type     = "Task"
         Resource = "arn:aws:states:::aws-sdk:redshiftdata:describeStatement"
         Parameters = {
           "Id.$" = "$.Id"
         }
-        Next = "IsProductsStatementDone"
+        Next  = "IsProductsLoadDone"
         Catch = [{ ErrorEquals = ["States.ALL"], Next = "PipelineFailed" }]
       }
 
-      IsProductsStatementDone = {
+      IsProductsLoadDone = {
         Type = "Choice"
         Choices = [
-          {
-            Variable     = "$.Status"
-            StringEquals = "FINISHED"
-            Next         = "LoadCustomersToRedshift"
-          },
-          {
-            Variable     = "$.Status"
-            StringEquals = "FAILED"
-            Next         = "PipelineFailed"
-          },
-          {
-            Variable     = "$.Status"
-            StringEquals = "ABORTED"
-            Next         = "PipelineFailed"
-          }
+          { Variable = "$.Status", StringEquals = "FINISHED", Next = "LoadCustomersToRedshift" },
+          { Variable = "$.Status", StringEquals = "FAILED",   Next = "PipelineFailed" },
+          { Variable = "$.Status", StringEquals = "ABORTED",  Next = "PipelineFailed" }
         ]
-        Default = "WaitForProductsStatement"
+        Default = "WaitForProductsLoad"
       }
 
-      # Step 4: Load customers.csv to Redshift using Data API and .sync integration
+      # Step 5: Load customers.csv 
       LoadCustomersToRedshift = {
         Type     = "Task"
         Resource = "arn:aws:states:::aws-sdk:redshiftdata:executeStatement"
@@ -265,49 +227,37 @@ resource "aws_sfn_state_machine" "pipeline" {
           Database      = "ecomm_db"
           Sql           = "TRUNCATE TABLE raw.customers; COPY raw.customers FROM 's3://${aws_s3_bucket.raw.bucket}/customers.csv' IAM_ROLE '${aws_iam_role.redshift.arn}' FORMAT AS CSV IGNOREHEADER 1 EMPTYASNULL BLANKSASNULL REGION '${var.aws_region}';"
         }
-        Next = "WaitForCustomersStatement"
+        Next = "WaitForCustomersLoad"
         Catch = [{ ErrorEquals = ["States.ALL"], Next = "PipelineFailed" }]
       }
 
-      WaitForCustomersStatement = {
+      WaitForCustomersLoad = {
         Type    = "Wait"
         Seconds = 15
-        Next    = "CheckCustomersStatement"
+        Next    = "CheckCustomersLoad"
       }
 
-      CheckCustomersStatement = {
+      CheckCustomersLoad = {
         Type     = "Task"
         Resource = "arn:aws:states:::aws-sdk:redshiftdata:describeStatement"
         Parameters = {
           "Id.$" = "$.Id"
         }
-        Next = "IsCustomersStatementDone"
+        Next  = "IsCustomersLoadDone"
         Catch = [{ ErrorEquals = ["States.ALL"], Next = "PipelineFailed" }]
       }
 
-      IsCustomersStatementDone = {
+      IsCustomersLoadDone = {
         Type = "Choice"
         Choices = [
-          {
-            Variable     = "$.Status"
-            StringEquals = "FINISHED"
-            Next         = "PipelineSucceeded"
-          },
-          {
-            Variable     = "$.Status"
-            StringEquals = "FAILED"
-            Next         = "PipelineFailed"
-          },
-          {
-            Variable     = "$.Status"
-            StringEquals = "ABORTED"
-            Next         = "PipelineFailed"
-          }
+          { Variable = "$.Status", StringEquals = "FINISHED", Next = "PipelineSucceeded" },
+          { Variable = "$.Status", StringEquals = "FAILED",   Next = "PipelineFailed" },
+          { Variable = "$.Status", StringEquals = "ABORTED",  Next = "PipelineFailed" }
         ]
-        Default = "WaitForCustomersStatement"
+        Default = "WaitForCustomersLoad"
       }
 
-      # Terminal states for success and failure
+      # Terminal states
       PipelineSucceeded = {
         Type = "Succeed"
       }
@@ -330,75 +280,4 @@ resource "aws_sfn_state_machine" "pipeline" {
     Project     = var.project_name
     Environment = var.environment
   }
-}
-
-# EventBridge rule — fires when Glue crawler finishes and sends task token back to Step Functions ───────────────────────────────
-# This is what replaces the polling loop for the crawler.
-# When Glue emits a SUCCEEDED state change event, EventBridge
-# fires this rule which sends SendTaskSuccess back to Step Functions.
-resource "aws_cloudwatch_event_rule" "crawler_done" {
-  name        = "${local.prefix}-crawler-done"
-  description = "Fires when the Glue crawler finishes — signals Step Functions"
-
-  event_pattern = jsonencode({
-    source      = ["aws.glue"]
-    detail-type = ["Glue Crawler State Change"]
-    detail = {
-      crawlerName = [aws_glue_crawler.raw.name]
-      state       = ["Succeeded"]
-    }
-  })
-
-  tags = {
-    Project     = var.project_name
-    Environment = var.environment
-  }
-}
-
-# EventBridge target — calls Step Functions SendTaskSuccess with the task token
-resource "aws_cloudwatch_event_target" "crawler_done_sfn" {
-  rule      = aws_cloudwatch_event_rule.crawler_done.name
-  target_id = "SendTaskSuccessToStepFunctions"
-  arn       = "arn:aws:states:${var.aws_region}:${data.aws_caller_identity.current.account_id}:stateMachine:${local.prefix}-pipeline"
-  role_arn  = aws_iam_role.eventbridge_sfn.arn
-
-  input_transformer {
-    input_paths = {
-      taskToken = "$.detail.taskToken"
-    }
-    input_template = "{\"taskToken\": \"<taskToken>\", \"output\": \"crawler-succeeded\"}"
-  }
-}
-
-# IAM role for EventBridge to call Step Functions
-resource "aws_iam_role" "eventbridge_sfn" {
-  name = "${local.prefix}-eventbridge-sfn-role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect    = "Allow"
-      Principal = { Service = "events.amazonaws.com" }
-      Action    = "sts:AssumeRole"
-    }]
-  })
-
-  tags = {
-    Project     = var.project_name
-    Environment = var.environment
-  }
-}
-
-resource "aws_iam_role_policy" "eventbridge_sfn_policy" {
-  name = "${local.prefix}-eventbridge-sfn-policy"
-  role = aws_iam_role.eventbridge_sfn.id
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [{
-      Effect   = "Allow"
-      Action   = "states:SendTaskSuccess"
-      Resource = aws_sfn_state_machine.pipeline.arn
-    }]
-  })
 }
