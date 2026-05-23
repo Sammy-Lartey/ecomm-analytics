@@ -22,3 +22,18 @@ output "glue_crawler_name" {
   description = "Glue crawler name — run after uploading CSVs"
   value       = aws_glue_crawler.raw.name
 }
+
+output "lambda_function_name" {
+  description = "Lambda trigger function name"
+  value       = aws_lambda_function.trigger.function_name
+}
+
+output "step_functions_arn" {
+  description = "Step Functions state machine ARN"
+  value       = aws_sfn_state_machine.pipeline.arn
+}
+
+output "step_functions_name" {
+  description = "Step Functions state machine name — drop a CSV in S3 to trigger"
+  value       = aws_sfn_state_machine.pipeline.name
+}
