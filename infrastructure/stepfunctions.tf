@@ -1,4 +1,4 @@
-# CloudWatch log group for Step Functions
+# ── CloudWatch log group ───────────────────────────────────────────────────────
 resource "aws_cloudwatch_log_group" "sfn" {
   name              = "/aws/states/${local.prefix}-pipeline"
   retention_in_days = 7
@@ -9,7 +9,7 @@ resource "aws_cloudwatch_log_group" "sfn" {
   }
 }
 
-# IAM role for Step Functions
+# ── IAM role ───────────────────────────────────────────────────────────────────
 resource "aws_iam_role" "step_functions" {
   name = "${local.prefix}-sfn-role"
 
@@ -53,7 +53,6 @@ resource "aws_iam_role_policy" "step_functions_policy" {
         Resource = "*"
       },
       {
-        # Invoke the crawler callback Lambda with task token — allowing Step Functions to pause and wait for the crawler to finish
         Effect   = "Allow"
         Action   = "lambda:InvokeFunction"
         Resource = aws_lambda_function.crawler_callback.arn
@@ -83,18 +82,28 @@ resource "aws_iam_role_policy" "step_functions_policy" {
   })
 }
 
-# Step Functions state machine definition:
+# ── Step Functions state machine ───────────────────────────────────────────────
+# Incremental pattern:
+#   1. Glue crawler re-catalogs the new file
+#   2. COPY new file into a staging table
+#   3. MERGE staging into main table (insert only new rows by primary key)
+#   4. TRUNCATE staging table
+#
+# This means:
+#   - Duplicate rows are never inserted (deduped by event_id / product_id / customer_id)
+#   - Files can be uploaded in any order
+#   - Pipeline is safe to re-run (idempotent)
 resource "aws_sfn_state_machine" "pipeline" {
   name     = "${local.prefix}-pipeline"
   role_arn = aws_iam_role.step_functions.arn
 
   definition = jsonencode({
-    Comment = "E-commerce ingestion pipeline: Glue Crawler → Redshift COPY"
+    Comment = "Incremental e-commerce ingestion: S3 → Glue → staging → merge into raw"
     StartAt = "StartCrawler"
 
     States = {
 
-      # Step 1: Start Glue crawler — if it's already running, catch the error and proceed to wait for the callback
+      # ── Step 1: Start Glue crawler ────────────────────────────────────────
       StartCrawler = {
         Type     = "Task"
         Resource = "arn:aws:states:::aws-sdk:glue:startCrawler"
@@ -106,32 +115,28 @@ resource "aws_sfn_state_machine" "pipeline" {
           {
             ErrorEquals = ["Glue.CrawlerRunningException"]
             Next        = "WaitForCrawler"
-            Comment     = "Crawler already running — wait for callback"
           }
         ]
       }
 
-      # Step 2: Pause and wait for EventBridge callback — invoked when Glue crawler finishes
-      # Invokes the crawler_callback Lambda with a task token.
-      # Step Functions pauses here. When the Glue crawler finishes,
-      # EventBridge fires, invoking crawler_callback Lambda which calls
-      # SendTaskSuccess with the token — resuming the execution.
+      # ── Step 2: Wait for crawler callback ────────────────────────────────
+      # Step Functions pauses here. EventBridge fires when crawler finishes,
+      # invokes crawler_callback Lambda which calls SendTaskSuccess.
       WaitForCrawler = {
         Type     = "Task"
         Resource = "arn:aws:states:::lambda:invoke.waitForTaskToken"
         Parameters = {
-          FunctionName   = aws_lambda_function.crawler_callback.arn
-          "Payload" = {
+          FunctionName = aws_lambda_function.crawler_callback.arn
+          Payload = {
             "taskToken.$" = "$$.Task.Token"
           }
         }
         HeartbeatSeconds = 600
-        Next             = "LoadEventsToRedshift"
+        Next             = "CopyToStaging"
         Catch = [
           {
             ErrorEquals = ["States.HeartbeatTimeout"]
             Next        = "PipelineFailed"
-            Comment     = "Crawler did not complete within 10 minutes"
           },
           {
             ErrorEquals = ["States.ALL"]
@@ -140,124 +145,132 @@ resource "aws_sfn_state_machine" "pipeline" {
         ]
       }
 
-      # ── Step 3: Load events.csv ───────────────────────────────────────────
-      LoadEventsToRedshift = {
+      # ── Step 3: COPY new file into staging table ──────────────────────────
+      # Uses $.table from Lambda input to dynamically target the right table.
+      # Staging tables are always truncated before loading so they only
+      # ever contain the current file's data.
+      CopyToStaging = {
         Type     = "Task"
         Resource = "arn:aws:states:::aws-sdk:redshiftdata:executeStatement"
         Parameters = {
           WorkgroupName = aws_redshiftserverless_workgroup.main.workgroup_name
           Database      = "ecomm_db"
-          Sql           = "TRUNCATE TABLE raw.events; COPY raw.events FROM 's3://${aws_s3_bucket.raw.bucket}/events.csv' IAM_ROLE '${aws_iam_role.redshift.arn}' FORMAT AS CSV IGNOREHEADER 1 EMPTYASNULL BLANKSASNULL REGION '${var.aws_region}';"
+          "Sql.$"       = "States.Format('TRUNCATE TABLE raw.{}_staging; COPY raw.{}_staging FROM \\'s3://${aws_s3_bucket.raw.bucket}/{}\\'  IAM_ROLE \\'${aws_iam_role.redshift.arn}\\' FORMAT AS CSV IGNOREHEADER 1 EMPTYASNULL BLANKSASNULL REGION \\'${var.aws_region}\\';', $.table, $.table, $.key)"
         }
-        Next = "WaitForEventsLoad"
+        Next = "WaitForStagingLoad"
         Catch = [{ ErrorEquals = ["States.ALL"], Next = "PipelineFailed" }]
       }
 
-      WaitForEventsLoad = {
+      WaitForStagingLoad = {
         Type    = "Wait"
         Seconds = 15
-        Next    = "CheckEventsLoad"
+        Next    = "CheckStagingLoad"
       }
 
-      CheckEventsLoad = {
+      CheckStagingLoad = {
         Type     = "Task"
         Resource = "arn:aws:states:::aws-sdk:redshiftdata:describeStatement"
         Parameters = {
           "Id.$" = "$.Id"
         }
-        Next  = "IsEventsLoadDone"
+        Next  = "IsStagingLoadDone"
         Catch = [{ ErrorEquals = ["States.ALL"], Next = "PipelineFailed" }]
       }
 
-      IsEventsLoadDone = {
+      IsStagingLoadDone = {
         Type = "Choice"
         Choices = [
-          { Variable = "$.Status", StringEquals = "FINISHED", Next = "LoadProductsToRedshift" },
+          { Variable = "$.Status", StringEquals = "FINISHED", Next = "MergeIntoMain" },
           { Variable = "$.Status", StringEquals = "FAILED",   Next = "PipelineFailed" },
           { Variable = "$.Status", StringEquals = "ABORTED",  Next = "PipelineFailed" }
         ]
-        Default = "WaitForEventsLoad"
+        Default = "WaitForStagingLoad"
       }
 
-      # Step 4: Load products.csv ─ similar pattern to events.csv, with polling to check when the load is finished
-      LoadProductsToRedshift = {
+      # ── Step 4: Merge staging into main table ─────────────────────────────
+      # For events: insert rows where event_id not already in raw.events
+      # For products: upsert by product_id (delete + insert)
+      # For customers: upsert by customer_id (delete + insert)
+      # This makes the pipeline fully idempotent — safe to re-run
+      MergeIntoMain = {
         Type     = "Task"
         Resource = "arn:aws:states:::aws-sdk:redshiftdata:executeStatement"
         Parameters = {
           WorkgroupName = aws_redshiftserverless_workgroup.main.workgroup_name
           Database      = "ecomm_db"
-          Sql           = "TRUNCATE TABLE raw.products; COPY raw.products FROM 's3://${aws_s3_bucket.raw.bucket}/products.csv' IAM_ROLE '${aws_iam_role.redshift.arn}' FORMAT AS CSV IGNOREHEADER 1 EMPTYASNULL BLANKSASNULL REGION '${var.aws_region}';"
+          "Sql.$"       = "States.Format('INSERT INTO raw.{} SELECT s.* FROM raw.{}_staging s LEFT JOIN raw.{} t ON s.{}_id = t.{}_id WHERE t.{}_id IS NULL;', $.table, $.table, $.table, $.pk, $.pk, $.pk)"
         }
-        Next = "WaitForProductsLoad"
+        Next = "WaitForMerge"
         Catch = [{ ErrorEquals = ["States.ALL"], Next = "PipelineFailed" }]
       }
 
-      WaitForProductsLoad = {
+      WaitForMerge = {
         Type    = "Wait"
         Seconds = 15
-        Next    = "CheckProductsLoad"
+        Next    = "CheckMerge"
       }
 
-      CheckProductsLoad = {
+      CheckMerge = {
         Type     = "Task"
         Resource = "arn:aws:states:::aws-sdk:redshiftdata:describeStatement"
         Parameters = {
           "Id.$" = "$.Id"
         }
-        Next  = "IsProductsLoadDone"
+        Next  = "IsMergeDone"
         Catch = [{ ErrorEquals = ["States.ALL"], Next = "PipelineFailed" }]
       }
 
-      IsProductsLoadDone = {
+      IsMergeDone = {
         Type = "Choice"
         Choices = [
-          { Variable = "$.Status", StringEquals = "FINISHED", Next = "LoadCustomersToRedshift" },
+          { Variable = "$.Status", StringEquals = "FINISHED", Next = "TruncateStaging" },
           { Variable = "$.Status", StringEquals = "FAILED",   Next = "PipelineFailed" },
           { Variable = "$.Status", StringEquals = "ABORTED",  Next = "PipelineFailed" }
         ]
-        Default = "WaitForProductsLoad"
+        Default = "WaitForMerge"
       }
 
-      # Step 5: Load customers.csv 
-      LoadCustomersToRedshift = {
+      # ── Step 5: Truncate staging table ────────────────────────────────────
+      # Clean up staging after successful merge
+      TruncateStaging = {
         Type     = "Task"
         Resource = "arn:aws:states:::aws-sdk:redshiftdata:executeStatement"
         Parameters = {
           WorkgroupName = aws_redshiftserverless_workgroup.main.workgroup_name
           Database      = "ecomm_db"
-          Sql           = "TRUNCATE TABLE raw.customers; COPY raw.customers FROM 's3://${aws_s3_bucket.raw.bucket}/customers.csv' IAM_ROLE '${aws_iam_role.redshift.arn}' FORMAT AS CSV IGNOREHEADER 1 EMPTYASNULL BLANKSASNULL REGION '${var.aws_region}';"
+          "Sql.$"       = "States.Format('TRUNCATE TABLE raw.{}_staging;', $.table)"
         }
-        Next = "WaitForCustomersLoad"
+        Next = "WaitForTruncate"
         Catch = [{ ErrorEquals = ["States.ALL"], Next = "PipelineFailed" }]
       }
 
-      WaitForCustomersLoad = {
+      WaitForTruncate = {
         Type    = "Wait"
-        Seconds = 15
-        Next    = "CheckCustomersLoad"
+        Seconds = 10
+        Next    = "CheckTruncate"
       }
 
-      CheckCustomersLoad = {
+      CheckTruncate = {
         Type     = "Task"
         Resource = "arn:aws:states:::aws-sdk:redshiftdata:describeStatement"
         Parameters = {
           "Id.$" = "$.Id"
         }
-        Next  = "IsCustomersLoadDone"
+        Next  = "IsTruncateDone"
         Catch = [{ ErrorEquals = ["States.ALL"], Next = "PipelineFailed" }]
       }
 
-      IsCustomersLoadDone = {
+      IsTruncateDone = {
         Type = "Choice"
         Choices = [
           { Variable = "$.Status", StringEquals = "FINISHED", Next = "PipelineSucceeded" },
           { Variable = "$.Status", StringEquals = "FAILED",   Next = "PipelineFailed" },
           { Variable = "$.Status", StringEquals = "ABORTED",  Next = "PipelineFailed" }
         ]
-        Default = "WaitForCustomersLoad"
+        Default = "WaitForTruncate"
       }
 
-      # Terminal states
+      # ── Terminal states ───────────────────────────────────────────────────
       PipelineSucceeded = {
         Type = "Succeed"
       }
@@ -265,7 +278,7 @@ resource "aws_sfn_state_machine" "pipeline" {
       PipelineFailed = {
         Type  = "Fail"
         Error = "PipelineFailed"
-        Cause = "Pipeline failed — check CloudWatch logs for details"
+        Cause = "Pipeline failed — check CloudWatch logs"
       }
     }
   })

@@ -11,38 +11,59 @@ sfn_client = boto3.client("stepfunctions")
 
 STATE_MACHINE_ARN = os.environ["STATE_MACHINE_ARN"]
 
+# Maps filename pattern → (table_name, primary_key)
+TABLE_MAP = {
+    "events":    ("events",    "event"),
+    "products":  ("products",  "product"),
+    "customers": ("customers", "customer"),
+}
+
+
+def resolve_table(key):
+    """
+    Resolve table name and primary key from filename.
+    Supports: events.csv, events_2025_11.csv, sample_events.csv etc.
+    """
+    filename = key.split("/")[-1].lower().replace(".csv", "")
+    for pattern, (table, pk) in TABLE_MAP.items():
+        if pattern in filename:
+            return table, pk
+    return None, None
+
 
 def handler(event, context):
-    """
-    Triggered by S3 ObjectCreated events.
-    Starts the Step Functions pipeline state machine when a CSV lands
-    in the raw S3 bucket.
-    """
     logger.info(f"Received event: {json.dumps(event)}")
 
     for record in event.get("Records", []):
         bucket = record["s3"]["bucket"]["name"]
         key    = record["s3"]["object"]["key"]
 
-        logger.info(f"New file detected: s3://{bucket}/{key}")
+        logger.info(f"New file: s3://{bucket}/{key}")
 
-        # only process CSV files
         if not key.endswith(".csv"):
-            logger.info(f"Skipping non-CSV file: {key}")
+            logger.info(f"Skipping non-CSV: {key}")
             continue
 
-        # unique execution name from filename + timestamp
-        filename       = key.replace("/", "_").replace(".", "_")
+        table, pk = resolve_table(key)
+        if not table:
+            logger.warning(f"Unrecognised file pattern: {key} — skipping")
+            continue
+
+        logger.info(f"Resolved to table={table}, pk={pk}_id")
+
         timestamp      = datetime.utcnow().strftime("%Y%m%dT%H%M%S")
+        filename       = key.replace("/", "_").replace(".", "_")
         execution_name = f"{filename}_{timestamp}"[:80]
 
         pipeline_input = {
             "bucket": bucket,
             "key":    key,
-            "file":   key.split("/")[-1].replace(".csv", "")
+            "table":  table,
+            "pk":     pk
         }
 
-        logger.info(f"Starting Step Functions: {execution_name}")
+        logger.info(f"Starting execution: {execution_name}")
+        logger.info(f"Input: {json.dumps(pipeline_input)}")
 
         response = sfn_client.start_execution(
             stateMachineArn = STATE_MACHINE_ARN,
@@ -50,6 +71,6 @@ def handler(event, context):
             input           = json.dumps(pipeline_input)
         )
 
-        logger.info(f"Execution started: {response['executionArn']}")
+        logger.info(f"Execution ARN: {response['executionArn']}")
 
     return {"statusCode": 200, "body": "Pipeline triggered"}
