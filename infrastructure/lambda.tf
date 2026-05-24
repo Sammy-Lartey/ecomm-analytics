@@ -1,6 +1,8 @@
+# ══════════════════════════════════════════════════════════════════════════════
 # PIPELINE TRIGGER LAMBDA
 # Invoked by S3 when a CSV lands in the raw bucket.
 # Starts the Step Functions pipeline execution.
+# ══════════════════════════════════════════════════════════════════════════════
 
 data "archive_file" "trigger" {
   type        = "zip"
@@ -104,9 +106,13 @@ resource "aws_s3_bucket_notification" "pipeline_trigger" {
   depends_on = [aws_lambda_permission.s3_invoke]
 }
 
+# ══════════════════════════════════════════════════════════════════════════════
 # CRAWLER CALLBACK LAMBDA
-# Invoked by EventBridge when the Glue crawler finishes.
-# Sends SendTaskSuccess to Step Functions, resuming the paused execution.
+# Two invocation paths:
+# 1. Step Functions invokes with task token → stores token in SSM
+# 2. EventBridge invokes when crawler finishes → retrieves token, sends
+#    SendTaskSuccess to resume the paused Step Functions execution
+# ══════════════════════════════════════════════════════════════════════════════
 
 data "archive_file" "crawler_callback" {
   type        = "zip"
@@ -159,9 +165,29 @@ resource "aws_iam_role_policy" "crawler_callback_policy" {
         Resource = "${aws_cloudwatch_log_group.lambda_crawler_callback.arn}:*"
       },
       {
+        # Send task success back to Step Functions
         Effect   = "Allow"
         Action   = "states:SendTaskSuccess"
         Resource = aws_sfn_state_machine.pipeline.arn
+      },
+      {
+        # Store and retrieve task token via SSM Parameter Store
+        Effect = "Allow"
+        Action = [
+          "ssm:PutParameter",
+          "ssm:GetParameter",
+          "ssm:DeleteParameter"
+        ]
+        Resource = "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:parameter/ecomm-analytics/*"
+      },
+      {
+        # KMS for SSM SecureString encryption
+        Effect = "Allow"
+        Action = [
+          "kms:Decrypt",
+          "kms:GenerateDataKey"
+        ]
+        Resource = "*"
       }
     ]
   })
@@ -192,7 +218,7 @@ resource "aws_lambda_permission" "eventbridge_invoke_callback" {
   source_arn    = aws_cloudwatch_event_rule.crawler_done.arn
 }
 
-# EventBridge rule — fires when Glue crawler succeeds, triggering the crawler_callback Lambda
+# ── EventBridge rule — fires when Glue crawler succeeds ──────────────────────
 resource "aws_cloudwatch_event_rule" "crawler_done" {
   name        = "${local.prefix}-crawler-done"
   description = "Fires when Glue crawler finishes — triggers callback to Step Functions"
