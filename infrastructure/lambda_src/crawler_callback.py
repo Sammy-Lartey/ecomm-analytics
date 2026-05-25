@@ -1,5 +1,4 @@
 import json
-import os
 import boto3
 import logging
 
@@ -8,51 +7,56 @@ logger.setLevel(logging.INFO)
 
 sfn_client = boto3.client("stepfunctions")
 
+CONTEXT_FIELDS = ["table", "key", "pk", "workgroupName", "copySql", "mergeSql"]
+
 
 def handler(event, context):
-    
     logger.info(f"Received event: {json.dumps(event)}")
 
-    ssm = boto3.client("ssm")
-    param_name = "/ecomm-analytics/crawler-task-token"
+    ssm         = boto3.client("ssm")
+    token_key   = "/ecomm-analytics/crawler-task-token"
+    context_key = "/ecomm-analytics/crawler-pipeline-context"
 
-    # Path 1 — invoked by Step Functions with task token
+    # Path 1 — Step Functions invokes with task token
     if "taskToken" in event:
-        task_token = event["taskToken"]
-        logger.info("Storing task token in SSM Parameter Store")
         ssm.put_parameter(
-            Name      = param_name,
-            Value     = task_token,
-            Type      = "SecureString",
-            Overwrite = True
+            Name=token_key, Value=event["taskToken"],
+            Type="SecureString", Overwrite=True
         )
-        logger.info("Task token stored — Step Functions is now paused")
-        return {"statusCode": 200, "body": "Token stored"}
+        pipeline_context = {k: event.get(k) for k in CONTEXT_FIELDS}
+        ssm.put_parameter(
+            Name=context_key, Value=json.dumps(pipeline_context),
+            Type="String", Overwrite=True
+        )
+        logger.info(f"Stored token and context: {list(pipeline_context.keys())}")
+        return {"statusCode": 200}
 
-    # Path 2 — invoked by EventBridge when crawler finishes
+    # Path 2 — EventBridge invokes when crawler finishes
     crawler_state = event.get("detail", {}).get("state", "unknown")
-    logger.info(f"EventBridge invocation — crawler state: {crawler_state}")
+    logger.info(f"Crawler state: {crawler_state}")
 
     if crawler_state != "Succeeded":
         logger.error(f"Crawler did not succeed: {crawler_state}")
-        return {"statusCode": 200, "body": f"Crawler state: {crawler_state} — not resuming"}
+        return {"statusCode": 200}
 
-    # Retrieve stored task token
-    try:
-        response    = ssm.get_parameter(Name=param_name, WithDecryption=True)
-        task_token  = response["Parameter"]["Value"]
-    except ssm.exceptions.ParameterNotFound:
-        logger.error("No task token found in SSM — cannot resume Step Functions")
-        raise ValueError("Task token not found in SSM Parameter Store")
+    token_resp      = ssm.get_parameter(Name=token_key, WithDecryption=True)
+    task_token      = token_resp["Parameter"]["Value"]
+    ctx_resp        = ssm.get_parameter(Name=context_key)
+    pipeline_context = json.loads(ctx_resp["Parameter"]["Value"])
 
-    logger.info("Sending SendTaskSuccess to Step Functions")
+    output = {"crawlerState": crawler_state}
+    output.update(pipeline_context)
+
+    logger.info(f"Sending SendTaskSuccess. Output keys: {list(output.keys())}")
+    logger.info(f"copySql preview: {output.get('copySql', '')[:100]}")
+
     sfn_client.send_task_success(
-        taskToken = task_token,
-        output    = json.dumps({"crawlerState": crawler_state})
+        taskToken=task_token,
+        output=json.dumps(output)
     )
 
-    # Clean up the token from SSM
-    ssm.delete_parameter(Name=param_name)
-    logger.info("Task token deleted from SSM — execution resumed")
+    ssm.delete_parameter(Name=token_key)
+    ssm.delete_parameter(Name=context_key)
+    logger.info("SSM cleaned — execution resumed")
 
-    return {"statusCode": 200, "body": "SendTaskSuccess sent"}
+    return {"statusCode": 200}

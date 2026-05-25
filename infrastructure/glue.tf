@@ -12,7 +12,7 @@ resource "aws_glue_crawler" "raw" {
   description   = "Crawls raw CSV files and registers schema in Glue catalog"
 
   s3_target {
-    path = "s3://${aws_s3_bucket.raw.bucket}/"
+    path = "s3://${aws_s3_bucket.raw.bucket}/ecommerce/"
   }
 
   schema_change_policy {

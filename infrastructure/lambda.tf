@@ -74,7 +74,11 @@ resource "aws_lambda_function" "trigger" {
 
   environment {
     variables = {
-      STATE_MACHINE_ARN = aws_sfn_state_machine.pipeline.arn
+      STATE_MACHINE_ARN  = aws_sfn_state_machine.pipeline.arn
+      REDSHIFT_ROLE_ARN  = aws_iam_role.redshift.arn
+      RAW_BUCKET         = aws_s3_bucket.raw.bucket
+      AWS_REGION_NAME    = var.aws_region
+      WORKGROUP_NAME     = aws_redshiftserverless_workgroup.main.workgroup_name
     }
   }
 
