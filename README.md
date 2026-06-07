@@ -15,15 +15,15 @@ Built as a portfolio project following the **AWS Certified Data Engineer – Ass
 
 | Sales Overview | Customer Loyalty |
 |---|---|
-| ![Sales Overview](assets/QS00.png) | ![Customer Loyalty](assets/QS01.png) |
+| ![Sales Overview](assets/AWS_QuickSight_Reports/QS00.png) | ![Customer Loyalty](assets/AWS_QuickSight_Reports/QS01.png) |
 
 | Channel Performance | Pricing & ASP |
 |---|---|
-| ![Channel Performance](assets/QS02.png) | ![Pricing](assets/QS03.png) |
+| ![Channel Performance](assets/AWS_QuickSight_Reports/QS02.png) | ![Pricing](assets/AWS_QuickSight_Reports/QS03.png) |
 
 | Product Performance & Billing | Discount Analysis |
 |---|---|
-| ![Product Performance](assets/QS04.png) | ![Discount Analysis](assets/QS05.png) |
+| ![Product Performance](assets/AWS_QuickSight_Reports/QS04.png) | ![Discount Analysis](assets/AWS_QuickSight_Reports/QS05.png) |
 
 ---
 
