@@ -180,4 +180,3 @@ Services used in this project: Amazon S3, AWS Glue, AWS Glue Data Catalog, Amazo
 
 **Samuel Lartey**
 AWS Certified Data Engineer – Associate
-[GitHub](https://github.com/Sammy-Lartey) · [LinkedIn](#)
