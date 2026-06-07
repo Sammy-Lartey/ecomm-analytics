@@ -170,7 +170,7 @@ The project uses Redshift Serverless which qualifies for a $300 free trial credi
 
 ---
 
-## Services Used
+## Services
 
 Services used in this project: Amazon S3, AWS Glue, AWS Glue Data Catalog, Amazon Redshift Serverless, Amazon QuickSight, AWS IAM, Amazon VPC, Amazon CloudWatch.
 
