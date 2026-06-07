@@ -29,7 +29,7 @@ Built as a portfolio project following the **AWS Certified Data Engineer – Ass
 
 ## dbt Lineage
 
-![dbt DAG](assets/dbt-dag.png)
+![dbt DAG](assets/dbt dag/dbt-dag.png)
 
 ---
 
