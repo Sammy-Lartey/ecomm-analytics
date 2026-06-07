@@ -97,7 +97,7 @@ The retailer sells software subscriptions and add-ons across analytics, design, 
 
 **Bronze** — Raw CSV files are loaded into Redshift via the `COPY` command without any transformation. This layer is the immutable source of truth. If anything goes wrong downstream, bronze is the recovery point.
 
-**Silver** — dbt staging models clean and enrich the bronze data. Type casting, null handling, region enrichment (US and Canada had no region assigned in the source — derived from country), discount code standardisation, and derived date columns are all applied here. dbt intermediate models then compute business logic — purchase history per customer, loyalty flags, discount performance, and product metrics — joining across the three staging models.
+**Silver** — dbt staging models clean and enrich the bronze data. Type casting, null handling, region enrichment (US and Canada had no region assigned in the source; derived from country), discount code standardisation, and derived date columns are all applied here. dbt intermediate models then compute business logic; purchase history per customer, loyalty flags, discount performance, and product metrics; joining across the three staging models.
 
 **Gold** — Seven dbt mart models are materialised as physical tables in Redshift. These are the final reporting layer, designed specifically to answer the 12 guiding business questions. QuickSight connects directly to these tables.
 
@@ -136,22 +136,22 @@ The retailer sells software subscriptions and add-ons across analytics, design, 
 ## Key Findings
 
 **Revenue and loyalty**
-Loyal customers — defined as those with 10 or more orders — represent 34% of the customer base but consistently account for 42–45% of monthly revenue. Revenue peaked at $1.38M in July 2025 and declined gradually through the dataset period, with the last two months showing a sharper drop likely due to incomplete data.
+Loyal customers — defined as those with 10 or more orders; represents 34% of the customer base but consistently account for 42–45% of monthly revenue. Revenue peaked at $1.38M in July 2025 and declined gradually through the dataset period, with the last two months showing a sharper drop likely due to incomplete data.
 
 **Channel performance**
-Website is the dominant channel at $10.3M total revenue and 1,340 loyal customers — more than double any other channel. Marketplace has the highest refund rate at 2.39% and the highest discount usage at 36.96%, suggesting a more price-sensitive buyer profile. Partner channel has the lowest refund rate at 1.7%.
+Website is the dominant channel at $10.3M total revenue and 1,340 loyal customers; more than double any other channel. Marketplace has the highest refund rate at 2.39% and the highest discount usage at 36.96%, suggesting a more price-sensitive buyer profile. Partner channel has the lowest refund rate at 1.7%.
 
 **Geography and pricing**
-EU accounts for 43% of total revenue. Germany has the highest average selling price at $767 while the United States, despite generating the most total revenue at $6.06M, has the lowest ASP at $585. The US also accounts for the most discounted orders at 3.63K — more than three times the next country.
+EU accounts for 43% of total revenue. Germany has the highest average selling price at $767 while the United States, despite generating the most total revenue at $6.06M, has the lowest ASP at $585. The US also accounts for the most discounted orders at 3.63K; more than three times the next country.
 
 **Customer segments**
-Consumer segment loyal customers generate $6.79M — more than SOHO, SMB, and Enterprise combined. The 25–34 age band is the strongest by revenue at $3.67M. Organic acquisition produces the most loyal customer revenue at $3.04M, outperforming paid search, email, and social.
+Consumer segment loyal customers generate $6.79M; more than SOHO, SMB, and Enterprise combined. The 25–34 age band is the strongest by revenue at $3.67M. Organic acquisition produces the most loyal customer revenue at $3.04M, outperforming paid search, email, and social.
 
 **Discounts**
-WELCOME10 and NEWCUSTOMER10 are the most frequently used codes. Black Friday codes (BFCM10, BFCM20) drive the most absolute revenue. STUDENT15 has the highest loyal customer conversion rate at 47.37% — suggesting student discounts strongly predict long-term retention.
+WELCOME10 and NEWCUSTOMER10 are the most frequently used codes. Black Friday codes (BFCM10, BFCM20) drive the most absolute revenue. STUDENT15 has the highest loyal customer conversion rate at 47.37%, suggesting student discounts strongly predict long-term retention.
 
 **Billing and products**
-Annual plans generate $19.84M vs $1.93M for monthly, and $20,240 average revenue per customer vs $1,960 — a 10x difference. Annual plans carry a higher refund rate at 30.73% vs 27.55% for monthly. Add-on attach rates are broadly even across products, ranging from 7–8%.
+Annual plans generate $19.84M vs $1.93M for monthly, and $20,240 average revenue per customer vs $1,960; a 10x difference. Annual plans carry a higher refund rate at 30.73% vs 27.55% for monthly. Add-on attach rates are broadly even across products, ranging from 7–8%.
 
 ---
 
