@@ -2,10 +2,7 @@ locals {
   prefix = "${var.project_name}-${var.environment}"
 }
 
-# Raw data landing zone 
-# CSV files land here untouched — source of truth for the pipeline
-# Glue crawler reads from here to register schema in the Data Catalog
-# Redshift COPY command reads from here to load the bronze layer
+# Raw data landing zone — immutable source of truth for the entire pipeline
 resource "aws_s3_bucket" "raw" {
   bucket        = "${local.prefix}-raw-${data.aws_caller_identity.current.account_id}"
   force_destroy = true
