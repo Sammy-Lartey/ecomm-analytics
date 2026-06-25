@@ -2,11 +2,16 @@ import openpyxl
 import csv
 import os
 
+# Export specific sheets from Excel workbook to CSV files
+
 src = "data/DataDNA Dataset Challenge - E-commerce Dataset - November 2025.xlsx"
 os.makedirs("data/csv", exist_ok=True)
 
+# Load workbook in read-only mode with data-only values
+
 wb = openpyxl.load_workbook(src, read_only=True, data_only=True)
 
+# Export each specified sheet to a CSV file
 for sheet_name in ["Events", "Products", "Customers"]:
     ws = wb[sheet_name]
     out_path = f"data/csv/{sheet_name.lower()}.csv"
