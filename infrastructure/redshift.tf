@@ -1,4 +1,3 @@
-# VPC for Redshift Serverless
 resource "aws_vpc" "main" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
@@ -62,7 +61,6 @@ resource "aws_route_table_association" "b" {
   route_table_id = aws_route_table.main.id
 }
 
-# Security group — allows IP + QuickSight 
 resource "aws_security_group" "redshift" {
   name        = "${local.prefix}-redshift-sg"
   description = "Redshift Serverless access"
@@ -76,7 +74,6 @@ resource "aws_security_group" "redshift" {
     cidr_blocks = [var.your_ip_cidr]
   }
 
-  # QuickSight CIDR for us-east-1
   ingress {
     description = "QuickSight us-east-1"
     from_port   = 5439
@@ -99,7 +96,6 @@ resource "aws_security_group" "redshift" {
   }
 }
 
-# Redshift Serverless namespace
 resource "aws_redshiftserverless_namespace" "main" {
   namespace_name      = "${local.prefix}-namespace"
   db_name             = "ecomm_db"
@@ -113,12 +109,12 @@ resource "aws_redshiftserverless_namespace" "main" {
   }
 }
 
-# Redshift Serverless workgroup
 resource "aws_redshiftserverless_workgroup" "main" {
   namespace_name = aws_redshiftserverless_namespace.main.namespace_name
   workgroup_name = "${local.prefix}-workgroup"
 
-  base_capacity      = 4    # 4""" RPUs — minimum, cheapest for dev
+  # 4 RPUs is the absolute minimum configuration allowed to keep development costs low
+  base_capacity      = 4
   publicly_accessible = true
 
   subnet_ids         = [aws_subnet.redshift_a.id, aws_subnet.redshift_b.id]
