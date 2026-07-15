@@ -179,4 +179,4 @@ Services used in this project: Amazon S3, AWS Glue, AWS Glue Data Catalog, Amazo
 ## Author
 
 **Samuel Lartey**
-AWS Certified Data Engineer – Associate
+
